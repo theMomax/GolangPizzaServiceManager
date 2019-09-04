@@ -10,7 +10,7 @@ func main() {
 	v1 := router.Group("/api/v1/")
 	{
 		v1.POST("/order/:id", controllers.Order)
-		v1.GET("/order", controllers.FetchAvailable)
+		v1.GET("/store", controllers.FetchAvailable)
 		v1.POST("/refill", controllers.AddResource)
 		v1.PUT("/recipe", controllers.CreateRecipe)
 		v1.GET("/recipe/:id", controllers.Fetch)

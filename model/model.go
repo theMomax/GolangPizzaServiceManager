@@ -3,7 +3,6 @@ package model
 import (
 	"errors"
 	"fmt"
-	"log"
 	"math"
 	"strconv"
 	"sync"
@@ -106,41 +105,33 @@ func (s *Store) Add(items ...*Resource) {
 		items[i].ID = 0
 	}
 	sM.Lock()
+	defer sM.Unlock()
 	s.Items = append(s.List(), items...)
 	DB.Save(s)
-	sM.Unlock()
 }
 
 // Remove items from the store. If there is not enough of one ingredient
 // available, the method returns an error
 func (s *Store) Remove(items ...*Resource) error {
-	log.Println(items)
 	changed := make([]*Resource, 0)
 	sM.Lock()
 	defer sM.Unlock()
 	for _, r := range items {
 		var available []*Resource
 		DB.Model(S).Where("name = ?", r.Name).Related(&available)
-		log.Println("amount of", r.Name, ":", len(available))
 		i := 0
 		for i < len(available) && r.Amount > 0 {
 			min := math.Min(available[i].Amount, r.Amount)
 			available[i].Amount -= min
-			fmt.Println("amount1", available[i].Amount)
 			r.Amount -= min
 			changed = append(changed, available[i])
-			fmt.Println("amount2", available[i].Amount)
 			i++
 		}
-		log.Println(r.Name, r.Amount)
 		if r.Amount > 0 {
 			return errors.New("not enough " + r.Name + " available")
 		}
 	}
-	log.Println(len(changed))
 	for i := range changed {
-		log.Println(changed[i])
-		fmt.Println("amount3", changed[i].Amount)
 		DB.Save(changed[i])
 		if changed[i].Amount <= 0 {
 			DB.Delete(changed[i])
