@@ -17,6 +17,8 @@ func main() {
 		v1.GET("/recipe", controllers.FetchAll)
 		v1.DELETE("/recipe/:id", controllers.DeleteRecipe)
 		v1.PUT("/recipe/:id", controllers.UpdateRecipe)
+
+		v1.GET("/price/:id", controllers.Price)
 	}
 	router.Run()
 }

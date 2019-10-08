@@ -2,7 +2,7 @@ package model
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"math"
 	"strconv"
 	"sync"
@@ -16,7 +16,7 @@ func init() {
 	var err error
 	DB, err = gorm.Open("mysql", "root:root@/pizza_golang?charset=utf8&parseTime=True&loc=Local")
 	if err != nil {
-		fmt.Println(err)
+		log.Println(err)
 		panic("failed to connect database")
 	}
 	//Migrate the schema
@@ -32,7 +32,7 @@ type (
 	// Store is the databse model for a pizza-services ingredient-storage
 	Store struct {
 		gorm.Model
-		Items []*Resource `json:"items"`
+		Items []*Resource
 	}
 
 	// StoreDescription is a model for the default store-model presented via the REST-api
@@ -45,13 +45,13 @@ type (
 	// Recipe is the database model for a pizza-recipe
 	Recipe struct {
 		gorm.Model
-		Title     string      `json:"title"`
-		Resources []*Resource `json:"resources"`
+		Title     string
+		Resources []*Resource
 	}
 
 	// RecipeDescription is a model for the default recipe-model presented via the REST-api
 	RecipeDescription struct {
-		ID        uint
+		ID        uint                   `json:"id"`
 		Title     string                 `json:"title"`
 		Resources []*ResourceDescription `json:"resources"`
 	}
@@ -61,8 +61,8 @@ type (
 	// Resource is the database model for a pizza-ingredient
 	Resource struct {
 		gorm.Model
-		Name     string  `json:"name"`
-		Amount   float64 `json:"amount"`
+		Name     string
+		Amount   float64
 		RecipeID uint
 		StoreID  uint
 	}
@@ -163,7 +163,7 @@ func (r *Recipe) Create() {
 // Read db operation
 func (r *Recipe) Read() error {
 	DB.Where("id = ?", r.ID).First(&r)
-	if r.ID == 0 {
+	if r.Title == "" {
 		return errors.New("recipe with id " + strconv.FormatUint(uint64(r.ID), 10) + " not found")
 	}
 	DB.Model(&r).Related(&r.Resources)

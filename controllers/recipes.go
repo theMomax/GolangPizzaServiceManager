@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -12,7 +11,7 @@ import (
 // CreateRecipe -> TODO: api-link
 func CreateRecipe(c *gin.Context) {
 	var recipe model.Recipe
-	if err := c.BindJSON(&recipe); err != nil {
+	if err := c.ShouldBind(&recipe); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "illegal format for recipe: " + err.Error()})
 		return
 	}
@@ -30,7 +29,6 @@ func CreateRecipe(c *gin.Context) {
 	var duplicate model.Recipe
 	model.DB.Where("title = ?", recipe.Title).First(&duplicate)
 	if duplicate.Title != "" {
-		fmt.Println(duplicate)
 		c.JSON(http.StatusConflict, gin.H{"message": "recipe with title " + duplicate.Title + " already exists"})
 		return
 	}
@@ -42,7 +40,7 @@ func CreateRecipe(c *gin.Context) {
 // UpdateRecipe -> TODO: api-link
 func UpdateRecipe(c *gin.Context) {
 	var recipe model.Recipe
-	if err := c.BindJSON(&recipe); err != nil {
+	if err := c.ShouldBind(&recipe); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "illegal format for recipe: " + err.Error()})
 		return
 	}

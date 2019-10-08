@@ -45,7 +45,7 @@ func FetchAvailable(c *gin.Context) {
 // AddResource -> TODO: api-link
 func AddResource(c *gin.Context) {
 	var items []*model.Resource
-	if err := c.BindJSON(&items); err != nil {
+	if err := c.ShouldBind(&items); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": "illegal format for resources: " + err.Error()})
 		return
 	}
